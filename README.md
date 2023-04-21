@@ -98,8 +98,30 @@ After updating the values, save the file and run the application. The USB HID SS
 5. Run the application.
 
 ```bash
-python3 usb_hid_ssh_server.py
+python3 IronDuCKie.py
 ```
+
+## Generating a Custom Signed Certificate for HTTPS
+
+To enable HTTPS for the web interface using a custom signed certificate, you'll need to generate a certificate and private key. Follow these steps to create a self-signed certificate:
+
+1. Install OpenSSL if you haven't already. You can download it from [https://www.openssl.org/source/](https://www.openssl.org/source/) or use your operating system's package manager to install it.
+
+2. Open a terminal window and navigate to the project directory (`IronDuCKie`).
+
+3. Run the following command to generate a 4096-bit RSA private key and a self-signed certificate that are valid for 365 days:
+
+```bash
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
+```
+
+You'll be prompted to enter some information for the certificate, such as country, state, and organization.
+
+4. The generated `key.pem` (private key) and `cert.pem` (certificate) files should be placed in the same directory as the `IronDuCKie.py` file. If you wish to store them in a different location, make sure to update the file paths in the `ssl_context` variable in the `main` function of `IronDuCKie.py`.
+
+Please note that since this is a self-signed certificate, most web browsers will display a warning indicating that the connection is not secure. To resolve this issue, consider obtaining a certificate from a trusted certificate authority (CA), or add an exception in your web browser for the self-signed certificate.
+
+Insert this section in the README.md after the "Installation" section, before the "Usage" section. This will ensure that users are aware of the HTTPS setup process before they start using the application.
 
 ## Usage
 

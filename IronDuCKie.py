@@ -133,7 +133,9 @@ def main():
     ssh_server_thread.daemon = True
     ssh_server_thread.start()
 
-    app.run(host=app_host, port=app_port)
+    ssl_context = (os.path.join(os.path.dirname(__file__), 'cert.pem'),
+                   os.path.join(os.path.dirname(__file__), 'key.pem'))
+    app.run(host=app_host, port=app_port, ssl_context=ssl_context)
 
 if __name__ == '__main__':
     main()
