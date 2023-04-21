@@ -15,7 +15,7 @@ This project is brought to you by Jorge Curbera & Sons Of Code, a group of hacke
 1. Clone this repository on your Raspberry Pi:
 
 ```bash
-git clone https://github.com/yourusername/ironduckie.git
+git clone https://github.com/ccokee/ironduckie.git
 cd ironduckie
 ```
 
