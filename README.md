@@ -1,4 +1,4 @@
-# USB HID SSH Server
+# IronDuCKie - USB HID SSH Server
 
 This project was developed by Jorge Curbera & Sons of Code, a group of hackers from León, Spain. The USB HID SSH Server application allows users to control a USB HID keyboard remotely through an SSH connection or via a web interface. The main purpose of this project is to provide a simple and efficient way to send keystrokes from remote devices to a USB HID keyboard connected to a Raspberry Pi.
 
