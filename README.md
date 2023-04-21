@@ -23,7 +23,7 @@ To run this application, you'll need the following dependencies:
 1. Clone the repository or download the source code.
 
 ```bash
-git clone https://github.com/sonsofcode/usb-hid-ssh-server.git
+git clone https://github.com/ccokee/IronDuCKie.git
 ```
 
 2. Change to the project directory.
