@@ -1,6 +1,6 @@
 # USB HID SSH Server
 
-This project was developed by Sons Of Code, a group of hackers from León, Spain. The USB HID SSH Server application allows users to control a USB HID keyboard remotely through an SSH connection or via a web interface. The main purpose of this project is to provide a simple and efficient way to send keystrokes from remote devices to a USB HID keyboard connected to a Raspberry Pi.
+This project was developed by Jorge Curbera & Sons of Code, a group of hackers from León, Spain. The USB HID SSH Server application allows users to control a USB HID keyboard remotely through an SSH connection or via a web interface. The main purpose of this project is to provide a simple and efficient way to send keystrokes from remote devices to a USB HID keyboard connected to a Raspberry Pi.
 
 ## Features
 
@@ -152,4 +152,4 @@ This project is open-source and is released under the [MIT License](LICENSE).
 
 ## Acknowledgments
 
-A big thanks to the Sons Of Code team for their dedication and hard work on this project. Their commitment to creating innovative and secure solutions has made this application possible.
+A big thanks to the Sons of Code team for their dedication and hard work on this project. Their commitment to creating innovative and secure solutions has made this application possible.
