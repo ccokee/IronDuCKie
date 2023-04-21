@@ -29,7 +29,7 @@ git clone https://github.com/ccokee/IronDuCKie.git
 2. Change to the project directory.
 
 ```bash
-cd usb-hid-ssh-server
+cd IronDuCKie
 ```
 
 3. Install the required dependencies.
@@ -38,7 +38,7 @@ cd usb-hid-ssh-server
 pip3 install -r requirements.txt
 ```
 
-4. Edit the `usb_hid_ssh_server.py` file and replace the `app.config['BASIC_AUTH_USERNAME']` and `app.config['BASIC_AUTH_PASSWORD']` with your desired credentials.
+4. Edit the `IronDuCKie.py` file and replace the `app.config['BASIC_AUTH_USERNAME']` and `app.config['BASIC_AUTH_PASSWORD']` with your desired credentials.
 
 ## IMPORTANT: Configuring Vendor ID and Product ID
 
