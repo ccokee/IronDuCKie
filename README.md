@@ -2,7 +2,7 @@
 
 IronDuCKie is a project that allows you to control a USB HID keyboard device connected to a Raspberry Pi. The Raspberry Pi communicates with a microcontroller (e.g., Arduino Pro Micro or Teensy) acting as a USB HID keyboard device, using the UART protocol. You can send keycodes to the microcontroller either via SSH commands or by uploading a text file through the web interface.
 
-This project is brought to you by Sons Of Code, a group of hackers from León, Spain.
+This project is brought to you by Jorge Curbera & Sons Of Code, a group of hackers from León, Spain.
 
 ## Prerequisites
 
