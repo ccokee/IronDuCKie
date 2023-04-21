@@ -86,7 +86,7 @@ In this example, the Vendor ID is `1A2B`, and the Product ID is `1A2B`.
 
 ### Update the Application
 
-Once you have obtained the Vendor ID and Product ID, update the `usb_hid_ssh_server.py` file with the appropriate values:
+Once you have obtained the Vendor ID and Product ID, update the `IronDuCKie.py` file with the appropriate values:
 
 ```python
 self.vendor_id = 0x1a2b  # Replace with your device's Vendor ID
