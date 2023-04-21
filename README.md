@@ -1,105 +1,41 @@
-# IronDuCKie - USB HID SSH Server
+# IronDuCKie
 
-This project was developed by Jorge Curbera & Sons of Code, a group of hackers from León, Spain. The USB HID SSH Server application allows users to control a USB HID keyboard remotely through an SSH connection or via a web interface. The main purpose of this project is to provide a simple and efficient way to send keystrokes from remote devices to a USB HID keyboard connected to a Raspberry Pi.
+IronDuCKie is a project that allows you to control a USB HID keyboard device connected to a Raspberry Pi. The Raspberry Pi communicates with a microcontroller (e.g., Arduino Pro Micro or Teensy) acting as a USB HID keyboard device, using the UART protocol. You can send keycodes to the microcontroller either via SSH commands or by uploading a text file through the web interface.
 
-## Features
+This project is brought to you by Sons Of Code, a group of hackers from León, Spain.
 
-- SSH server for remote control of a USB HID keyboard
-- Web interface with HTTP Basic Authentication for uploading text files containing keycodes
-- Customizable MOTD for the SSH server
+## Prerequisites
 
-## Requirements
-
-To run this application, you'll need the following dependencies:
-
-- Python 3.6 or higher
-- `hid` (0.10.1)
-- `paramiko` (2.7.2)
-- `Flask` (2.1.1)
-- `pyudev` (0.22.0)
+- Raspberry Pi
+- Microcontroller (e.g., Arduino Pro Micro or Teensy)
+- USB cable to connect the microcontroller to the target computer
 
 ## Installation
 
-1. Clone the repository or download the source code.
+1. Clone this repository on your Raspberry Pi:
 
 ```bash
-git clone https://github.com/ccokee/IronDuCKie.git
+git clone https://github.com/yourusername/ironduckie.git
+cd ironduckie
 ```
 
-2. Change to the project directory.
-
-```bash
-cd IronDuCKie
-```
-
-3. Install the required dependencies.
+2. Install the required Python dependencies:
 
 ```bash
 pip3 install -r requirements.txt
 ```
 
-4. Edit the `IronDuCKie.py` file and replace the `app.config['BASIC_AUTH_USERNAME']` and `app.config['BASIC_AUTH_PASSWORD']` with your desired credentials.
+3. Upload the Arduino code provided in this repository to your microcontroller using the Arduino IDE or an alternative method.
 
-## IMPORTANT: Configuring Vendor ID and Product ID
+4. Connect the microcontroller to the Raspberry Pi using the UART protocol. For example, with an Arduino Pro Micro:
 
-Before using the USB HID SSH Server application, it is essential to properly configure the Vendor ID (`vendor_id`) and Product ID (`product_id`) of your USB HID device. This information is required to establish a connection with the device and ensure the application works as expected.
+   - Connect the Arduino Pro Micro's TX pin to the Raspberry Pi's RX pin (GPIO 15, UART0_RXD)
+   - Connect the Arduino Pro Micro's RX pin to the Raspberry Pi's TX pin (GPIO 14, UART0_TXD)
+   - Connect the GND pins of both devices together
 
-To find the Vendor ID and Product ID of your USB HID device, follow these steps:
+5. Update the `users` dictionary in `usb_hid_ssh_server.py` with your desired username and password for Basic Auth.
 
-### On Linux
-
-1. Connect the USB HID device to your computer.
-2. Open a terminal window and run the following command:
-
-```bash
-lsusb
-```
-
-This command lists all connected USB devices and their information, including the Vendor ID and Product ID.
-
-Example output:
-
-```
-Bus 001 Device 002: ID 1a2b:1a2b USB Keyboard Manufacturer
-```
-
-In this example, the Vendor ID is `1a2b`, and the Product ID is `1a2b`.
-
-### On Windows
-
-1. Connect the USB HID device to your computer.
-2. Open Device Manager by right-clicking on the Start button and selecting Device Manager.
-3. Expand the "Human Interface Devices" category.
-4. Locate your USB HID device, right-click on it, and select Properties.
-5. Navigate to the Details tab.
-6. Select "Hardware Ids" from the Property drop-down menu.
-
-You should see a list of Hardware Ids for the connected device. The Vendor ID and Product ID are displayed after "VID_" and "PID_" respectively.
-
-Example:
-
-```
-HID\VID_1A2B&PID_1A2B
-```
-
-In this example, the Vendor ID is `1A2B`, and the Product ID is `1A2B`.
-
-### Update the Application
-
-Once you have obtained the Vendor ID and Product ID, update the `IronDuCKie.py` file with the appropriate values:
-
-```python
-self.vendor_id = 0x1a2b  # Replace with your device's Vendor ID
-self.product_id = 0x1a2b  # Replace with your device's Product ID
-```
-
-After updating the values, save the file and run the application. The USB HID SSH Server should now connect to your device and function correctly.
-
-5. Run the application.
-
-```bash
-python3 IronDuCKie.py
-```
+6. Update the SSH username and password in the `check_auth_password` method in the `CustomSSHServer` class in `usb_hid_ssh_server.py`.
 
 ## Generating a Custom Signed Certificate for HTTPS
 
@@ -107,7 +43,7 @@ To enable HTTPS for the web interface using a custom signed certificate, you'll 
 
 1. Install OpenSSL if you haven't already. You can download it from [https://www.openssl.org/source/](https://www.openssl.org/source/) or use your operating system's package manager to install it.
 
-2. Open a terminal window and navigate to the project directory (`IronDuCKie`).
+2. Open a terminal window and navigate to the project directory (`ironduckie`).
 
 3. Run the following command to generate a 4096-bit RSA private key and a self-signed certificate that are valid for 365 days:
 
@@ -117,39 +53,39 @@ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
 
 You'll be prompted to enter some information for the certificate, such as country, state, and organization.
 
-4. The generated `key.pem` (private key) and `cert.pem` (certificate) files should be placed in the same directory as the `IronDuCKie.py` file. If you wish to store them in a different location, make sure to update the file paths in the `ssl_context` variable in the `main` function of `IronDuCKie.py`.
+4. The generated `key.pem` (private key) and `cert.pem` (certificate) files should be placed in the same directory as the `usb_hid_ssh_server.py` file. If you wish to store them in a different location, make sure to update the file paths in the `ssl_context` variable in the `main` function of `usb_hid_ssh_server.py`.
 
 Please note that since this is a self-signed certificate, most web browsers will display a warning indicating that the connection is not secure. To resolve this issue, consider obtaining a certificate from a trusted certificate authority (CA), or add an exception in your web browser for the self-signed certificate.
 
-Insert this section in the README.md after the "Installation" section, before the "Usage" section. This will ensure that users are aware of the HTTPS setup process before they start using the application.
-
 ## Usage
 
-
-### SSH Connection
-
-To connect to the SSH server and send keycodes, use the following command:
+1. Start the IronDuCKie server by running the following command:
 
 ```bash
-ssh <username>@<raspberry_pi_ip> -p 2222
+python3 usb_hid_ssh_server.py
 ```
 
-Replace `<username>` with the username set in `app.config['BASIC_AUTH_USERNAME']` and `<raspberry_pi_ip>` with the IP address of your Raspberry Pi. After connecting, you can send keycodes as plain text through the SSH connection.
+2. To send keycodes via SSH, connect to the SSH server using the following command (replace `your_username` and `your_password` with the SSH username and password you set earlier):
 
-### Web Interface
-
-To access the web interface, open a web browser and navigate to:
-
-```
-http://<raspberry_pi_ip>:5000/upload
+```bash
+ssh your_username@your_raspberry_pi_ip -p 2222
 ```
 
-Replace `<raspberry_pi_ip>` with the IP address of your Raspberry Pi. Log in with the credentials set in `app.config['BASIC_AUTH_USERNAME']` and `app.config['BASIC_AUTH_PASSWORD']`. You can then upload a text file containing keycodes, and the application will send the keycodes to the USB HID keyboard.
+When prompted, enter your SSH password. Once connected, you can send keycodes by typing them in the SSH session. The keycodes will be sent to the microcontroller, which will then send the corresponding keystrokes to the connected computer.
+
+3. To send keycodes via the web interface, open your web browser and navigate to `https://your_raspberry_pi_ip:5000/upload`. You may receive a warning due to the self-signed certificate. If so, either add an exception in your web browser or use a certificate from a trusted certificate authority (CA).
+
+When prompted, enter the username and password you set for Basic Auth. Once logged in, you can upload a text file containing the keycodes you want to send. The keycodes will be sent to the microcontroller, which will then send the corresponding keystrokes to the connected computer.
+
+## IMPORTANT: Microcontroller Vendor ID and Device ID
+
+To ensure that the microcontroller is recognized as a keyboard by the connected computer, make sure that it is programmed with the appropriate USB Vendor ID (VID) and Product ID (PID). For example, the Arduino Pro Micro and Teensy boards use the following IDs:
+
+- Arduino Pro Micro: VID 0x2341, PID 0x8036 (Arduino Leonardo)
+- Teensy: VID 0x16C0, PID 0x0486 (Teensyduino)
+
+These IDs are used by default when programming the microcontroller using the Arduino IDE and the provided Arduino code. If you're using a different microcontroller or a custom USB HID keyboard library, you may need to set the VID and PID manually to ensure that the microcontroller is recognized as a keyboard by the connected computer.
 
 ## License
 
-This project is open-source and is released under the [MIT License](LICENSE).
-
-## Acknowledgments
-
-A big thanks to the Sons of Code team for their dedication and hard work on this project. Their commitment to creating innovative and secure solutions has made this application possible.
+This project is licensed under the MIT License.
