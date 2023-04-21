@@ -15,8 +15,8 @@ This project is brought to you by Jorge Curbera & Sons Of Code, a group of hacke
 1. Clone this repository on your Raspberry Pi:
 
 ```bash
-git clone https://github.com/ccokee/ironduckie.git
-cd ironduckie
+git clone https://github.com/ccokee/IronDuCKie.git
+cd IronDuCKie
 ```
 
 2. Install the required Python dependencies:
@@ -33,9 +33,9 @@ pip3 install -r requirements.txt
    - Connect the Arduino Pro Micro's RX pin to the Raspberry Pi's TX pin (GPIO 14, UART0_TXD)
    - Connect the GND pins of both devices together
 
-5. Update the `users` dictionary in `usb_hid_ssh_server.py` with your desired username and password for Basic Auth.
+5. Update the `users` dictionary in `IronDuCKie.py` with your desired username and password for Basic Auth.
 
-6. Update the SSH username and password in the `check_auth_password` method in the `CustomSSHServer` class in `usb_hid_ssh_server.py`.
+6. Update the SSH username and password in the `check_auth_password` method in the `CustomSSHServer` class in `IronDuCKie.py`.
 
 ## Generating a Custom Signed Certificate for HTTPS
 
@@ -53,7 +53,7 @@ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
 
 You'll be prompted to enter some information for the certificate, such as country, state, and organization.
 
-4. The generated `key.pem` (private key) and `cert.pem` (certificate) files should be placed in the same directory as the `usb_hid_ssh_server.py` file. If you wish to store them in a different location, make sure to update the file paths in the `ssl_context` variable in the `main` function of `usb_hid_ssh_server.py`.
+4. The generated `key.pem` (private key) and `cert.pem` (certificate) files should be placed in the same directory as the `IronDuCKie.py` file. If you wish to store them in a different location, make sure to update the file paths in the `ssl_context` variable in the `main` function of `IronDuCKie.py`.
 
 Please note that since this is a self-signed certificate, most web browsers will display a warning indicating that the connection is not secure. To resolve this issue, consider obtaining a certificate from a trusted certificate authority (CA), or add an exception in your web browser for the self-signed certificate.
 
@@ -62,7 +62,7 @@ Please note that since this is a self-signed certificate, most web browsers will
 1. Start the IronDuCKie server by running the following command:
 
 ```bash
-python3 usb_hid_ssh_server.py
+python3 IronDuCKie.py
 ```
 
 2. To send keycodes via SSH, connect to the SSH server using the following command (replace `your_username` and `your_password` with the SSH username and password you set earlier):
