@@ -1,125 +1,80 @@
-import hid
-import paramiko
-import socket
-import threading
-import time
-from flask import Flask, request, render_template, Response, abort
-from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import threading
+import paramiko
+import base64
+import serial
+from flask import Flask, request, render_template, redirect, url_for
+from flask_httpauth import HTTPBasicAuth
+
+app = Flask(__name__)
+auth = HTTPBasicAuth()
+
+users = {
+    "admin": "password",  # Replace with your desired username and password for Basic Auth
+}
+
+@auth.verify_password
+def verify_password(username, password):
+    if username in users and users[username] == password:
+        return username
+
 
 class USBHIDKeyboard:
+
     def __init__(self):
-        self.vendor_id = 0x1a2b  # Reemplaza con el ID del fabricante de tu dispositivo USB
-        self.product_id = 0x1a2b  # Reemplaza con el ID del producto de tu dispositivo USB
-        self.interface_number = 0
-        self.usage_page = 0x1
-        self.usage = 0x6
-        self.device = None
+        self.ser = serial.Serial('/dev/serial0', 9600, timeout=1)
+        self.ser.flush()
 
-        self._connect()
-
-    def _connect(self):
-        for device in hid.enumerate():
-            if (device['vendor_id'] == self.vendor_id and
-                    device['product_id'] == self.product_id and
-                    device['interface_number'] == self.interface_number and
-                    device['usage_page'] == self.usage_page and
-                    device['usage'] == self.usage):
-                self.device = hid.device()
-                self.device.open(device['vendor_id'], device['product_id'])
-
-    def send_key(self, key):
-        if self.device is None:
-            print("Dispositivo no encontrado")
-            return
-
-        self.device.write([0x00, key])
-        self.device.write([0x00, 0x00])
+    def send_keycode(self, keycode):
+        try:
+            self.ser.write(bytes(keycode, 'utf-8'))
+        except Exception as e:
+            print(f"Error sending keycode: {e}")
 
 
-class SSHServer(paramiko.ServerInterface):
+class CustomSSHServer(paramiko.ServerInterface):
+
     def __init__(self, usb_hid_keyboard):
         self.usb_hid_keyboard = usb_hid_keyboard
+        self.event = threading.Event()
 
     def check_auth_password(self, username, password):
-        return paramiko.AUTH_SUCCESSFUL
+        if username == "sshuser" and password == "sshpassword":  # Replace with your desired SSH username and password
+            return paramiko.AUTH_SUCCESSFUL
+        return paramiko.AUTH_FAILED
 
     def check_channel_request(self, kind, chanid):
-        if kind == 'session':
+        if kind == "session":
             return paramiko.OPEN_SUCCEEDED
         return paramiko.OPEN_FAILED_ADMINISTRATIVELY_PROHIBITED
 
-    def check_channel_shell_request(self, channel):
-        motd = '''
-Welcome to:
-.___                     ________         _________  ____  __.__        
-|   |______  ____   ____ \______ \  __ __ \_   ___ \|    |/ _|__| ____  
-|   \_  __ \/  _ \ /    \ |    |  \|  |  \/    \  \/|      < |  |/ __ \ 
-|   ||  | \(  <_> )   |  \|    `   \  |  /\     \___|    |  \|  \  ___/ 
-|___||__|   \____/|___|  /_______  /____/  \______  /____|__ \__|\___  >
-                       \/        \/               \/        \/       \/  
-                                                        by Sons of Code
-        '''
-        channel.send(motd)
+    def check_channel_exec_request(self, channel, command):
+        self.usb_hid_keyboard.send_keycode(command.decode("utf-8"))
+        self.event.set()
         return True
 
-    def check_channel_pty_request(self, channel, term, width, height, pixelwidth, pixelheight, modes):
-        return True
 
 def start_ssh_server(host, port, usb_hid_keyboard):
-    server_key = paramiko.RSAKey.generate(1024)
-    ssh_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    ssh_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    ssh_server.bind((host, port))
-    ssh_server.listen(5)
+    ssh_host_key = paramiko.RSAKey.generate(2048)
+    ssh_server = paramiko.Transport((host, port))
+    ssh_server.add_server_key(ssh_host_key)
 
     while True:
-        client_socket, addr = ssh_server.accept()
-        transport = paramiko.Transport(client_socket)
-        transport.add_server_key(server_key)
-        server_interface = SSHServer(usb_hid_keyboard)
-        transport.start_server(server=server_interface)
+        ssh_server.start_server(server=CustomSSHServer(usb_hid_keyboard))
+        channel = ssh_server.accept()
+        ssh_server.stop()
 
-        channel = transport.accept()
-        while True:
-            try:
-                key_code = channel.recv(256)
-                if not key_code:
-                    break
-                usb_hid_keyboard.send_key(int(key_code))
-            except Exception as e:
-                print(f"Error sending key: {e}")
-                break
 
-        channel.close()
-        transport.close()
+@app.route("/upload", methods=["GET", "POST"])
+@auth.login_required
+def upload():
+    if request.method == "POST":
+        text_file = request.files["textfile"]
+        content = text_file.read().decode("utf-8")
+        usb_hid_keyboard.send_keycode(content)
+        return redirect(url_for("upload"))
+    return render_template("upload.html")
 
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = '/tmp'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024
-app.config['BASIC_AUTH_USERNAME'] = 'iron'
-app.config['BASIC_AUTH_PASSWORD'] = generate_password_hash('duckie')
-
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_file():
-    if request.authorization:
-        username = request.authorization.username
-        password = request.authorization.password
-        if (username == app.config['BASIC_AUTH_USERNAME'] and
-                check_password_hash(app.config['BASIC_AUTH_PASSWORD'], password)):
-            if request.method == 'POST':
-                file = request.files['file']
-                if file and file.filename.endswith('.txt'):
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'input.txt'))
-                    return 'Archivo subido con éxito.', 200
-                else:
-                    return 'Only .txt files.', 400
-            else:
-                return render_template('upload.html')
-        else:
-            abort(401)
-    else:
-        return Response('Por favor, inicia sesión.', 401, {'WWW-Authenticate': 'Basic realm="Access restricted"'})
 
 def main():
     host = '0.0.0.0'
@@ -137,5 +92,6 @@ def main():
                    os.path.join(os.path.dirname(__file__), 'key.pem'))
     app.run(host=app_host, port=app_port, ssl_context=ssl_context)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

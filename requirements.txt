@@ -2,3 +2,4 @@ hid==0.10.1
 paramiko==2.7.2
 Flask==2.1.1
 pyudev==0.22.0
+pyserial==3.5
