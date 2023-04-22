@@ -3,6 +3,7 @@ import threading
 import paramiko
 import base64
 import serial
+import telegram_bot
 from flask import Flask, request, render_template, redirect, url_for
 from flask_httpauth import HTTPBasicAuth
 
@@ -90,6 +91,12 @@ def main():
 
     ssl_context = (os.path.join(os.path.dirname(__file__), 'cert.pem'),
                    os.path.join(os.path.dirname(__file__), 'key.pem'))
+
+    telegram_bot_token = "YOUR_TELEGRAM_BOT_TOKEN"  # Replace with your Telegram bot token
+    telegram_bot_thread = threading.Thread(target=telegram_bot.main, args=(telegram_bot_token, usb_hid_keyboard.send_keycode, users))
+    telegram_bot_thread.daemon = True
+    telegram_bot_thread.start()
+
     app.run(host=app_host, port=app_port, ssl_context=ssl_context)
 
 
